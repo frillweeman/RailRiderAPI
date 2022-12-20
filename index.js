@@ -8,10 +8,10 @@ import {
 } from "./overpass.js";
 
 app.get("/", (_, res) => {
-  res.send("Hello, World!");
+  res.send("it works");
 });
 
-app.get("/nearbyRailroads", (req, res) => {
+app.get("/railways", (req, res) => {
   getNearbyRailroads(req.query.coordinates, req.query.radius)
     .then(railways => {
       res.send(railways);
@@ -19,8 +19,8 @@ app.get("/nearbyRailroads", (req, res) => {
     .catch(e => res.send(e));
 });
 
-app.get("/railroad/:railroadId/crossings", (req, res) => {
-  getAllCrossings(req.params.railroadId)
+app.get("/railways/:railwayId/crossings", (req, res) => {
+  getAllCrossings(req.params.railwayId)
     .then(apiResult => res.send(apiResult))
     .catch(e => res.send(e));
 });
