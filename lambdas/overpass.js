@@ -1,6 +1,6 @@
-import { lineString } from "@turf/turf";
-import axios from "axios";
-import osmtogeojson from "osmtogeojson";
+const { lineString } = require("@turf/turf");
+const axios = require("axios");
+const osmtogeojson = require("osmtogeojson");
 
 const overpassAPI = axios.create({
   baseURL: "https://overpass-api.de/api/interpreter",
@@ -39,7 +39,7 @@ function operatorToAbbreviation(operator) {
  * @param {number} radius radius (in meters) of search around coordinates
  * @returns {Promise<object[]>} array of nearby railroads with OSM id and name
  */
-export async function getNearbyRailroads(coordinates, radius) {
+module.exports.getNearbyRailroads = async function(coordinates, radius) {
   const query = `rel[route="railway"](around:${radius},${coordinates});
     out tags;`;
   const { elements } = await queryOverpass(query, false);
@@ -54,7 +54,7 @@ export async function getNearbyRailroads(coordinates, radius) {
  * @param {number} railwayId OSM id of the railway
  * @returns {object} OSM linestring of all nodes of the railway
  */
-export async function getRailroadPolyline(railwayId) {
+module.exports.getRailroadPolyline = async function(railwayId) {
   const query = ``;
   const nodes = await queryOverpass(query);
   return lineString(nodes.features.map(point => point.geometry.coordinates));
@@ -65,7 +65,7 @@ export async function getRailroadPolyline(railwayId) {
  * @param {number} railwayId OSM id of the railway
  * @returns {object} OSM linestring of all crossings on the railway
  */
-export async function getAllCrossings(railwayId) {
+module.exports.getAllCrossings = async function(railwayId) {
   const query = `rel(id:${railwayId});
   way(r);
   node(w)["railway"="level_crossing"];
