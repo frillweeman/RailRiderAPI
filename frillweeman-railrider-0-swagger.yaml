@@ -1,0 +1,131 @@
+openapi: 3.0.0
+info:
+  version: '0'
+  title: railrider
+  description: ''
+paths:
+  /railways:
+    get:
+      summary: Gets a list of nearby railways to a given location and radius
+      description: Call this to get nearby railways. The returned railway id can be used in subsequent calls to get more railway-specific data.
+      parameters:
+        - in: query
+          name: coordinates
+          schema:
+            type: string
+          description: The location around which to search
+          example: '34.612583,-86.988472'
+        - in: query
+          name: radius
+          schema:
+            type: integer
+          description: radius (in meters) of search around coordinates
+          example: 100
+        
+      responses:
+        '200':
+          description: a list of nearby railways
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Railway'
+        '404':
+          description: no nearby railways found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /railways/{railwayId}/crossings:
+    get:
+      summary: Gets a GeoJson LineString of all the crossings on the requested railway
+      description: Call this to get a list of all crossings on a requested railway.
+      parameters:
+        - in: path
+          required: true
+          name: railwayId
+          schema:
+            type: integer
+          description: id of the railway
+          example: 9200149
+      responses:
+        '200':
+          description: a GeoJson LineString of crossings on the railway
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LineString'
+        '404':
+          description: unknown railway
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /railways/{railwayId}/path:
+    get:
+      summary: Gets a GeoJson LineString of the railway's path
+      description: Call this to get a LineString of the railway's nodes for plotting on a map.
+      parameters:
+        - in: path
+          required: true
+          name: railwayId
+          schema:
+            type: integer
+          description: id of the railway
+          example: 9200149
+      responses:
+        '200':
+          description: a GeoJson LineString of nodes along the railway
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LineString'
+        '404':
+          description: unknown railway
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/frillweeman/railrider/0
+components:
+  schemas:
+    Railway:
+      title: Railway
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 9200149
+        name:
+          type: string
+          example: '[BNSF] Front Range Subdivision'
+    LineString:
+      title: LineString
+      type: object
+      properties:
+        type:
+          enum: ['LineString']
+          type: string
+        coordinates:
+          type: array
+          items:
+            type: number
+          example: '[34.612583,-86.988472]'
+    Error:
+      title: Error
+      type: object
+      properties:
+        errorCode:
+          type: integer
+          example: 101
+        description:
+          type: string
+          example: 'Invalid railway id'
